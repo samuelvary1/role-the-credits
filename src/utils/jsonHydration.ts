@@ -1,5 +1,12 @@
-import { camelCase, forOwn, forIn, isBoolean, isUndefined, isArray } from 'lodash';
-import { Collection, makeCollection } from '../lib/entities/Collection';
+import {
+  camelCase,
+  forOwn,
+  forIn,
+  isBoolean,
+  isUndefined,
+  isArray
+} from "lodash";
+import { Collection, makeCollection } from "../lib/entities/Collection";
 
 export type AnyObject = { [key: string]: any };
 
@@ -60,7 +67,10 @@ export const jsonHydrateCollection = <T extends {}, C extends Collection<T>>(
  * Hydrates an entity from a JSON object. Since the object is in JSON it is assumed that the keys
  * are all snake cased instead of camel cased.
  */
-export const jsonHydrateEntity = <T extends AnyObject>(value: object, entity: T): T => {
+export const jsonHydrateEntity = <T extends AnyObject>(
+  value: object,
+  entity: T
+): T => {
   const serialized: AnyObject = serialize(value);
   // The typeof entity makes this work because of black magic.
   const o: AnyObject = {};
@@ -72,7 +82,9 @@ export const jsonHydrateEntity = <T extends AnyObject>(value: object, entity: T)
       !isSameType(defaultV, serialized[k])
     ) {
       throw new TypeError(
-        `\`${k}\` value: \`${JSON.stringify(serialized[k])}\` has default value \`${JSON.stringify(defaultV)}\`.`
+        `\`${k}\` value: \`${JSON.stringify(
+          serialized[k]
+        )}\` has default value \`${JSON.stringify(defaultV)}\`.`
       );
     }
     const v = coerceTypes(serialized[k], defaultV);
@@ -85,11 +97,14 @@ export const jsonHydrateEntity = <T extends AnyObject>(value: object, entity: T)
  * Decides if we should attempt to serialize a value. It will only attempt to serialize values
  * that are of type Array and Object. Anything else gets the original value back.
  */
-export const serialize = (value: any, transform: (key: string) => string = camelCase): any => {
+export const serialize = (
+  value: any,
+  transform: (key: string) => string = camelCase
+): any => {
   const vT: string = getRealType(value);
-  if (vT === 'object') {
+  if (vT === "object") {
     return serializeObject(value, transform);
-  } else if (vT === 'array') {
+  } else if (vT === "array") {
     return serializeArray(value, transform);
   }
   return value;
@@ -99,7 +114,10 @@ export const serialize = (value: any, transform: (key: string) => string = camel
  * Serializes the value of an array. If the type of value in the array is an object then the object keys
  * will be turned into camel case.
  */
-const serializeArray = (value: any[], transform: (key: string) => string): any[] => {
+const serializeArray = (
+  value: any[],
+  transform: (key: string) => string
+): any[] => {
   return value.map(v => serialize(v, transform));
 };
 
@@ -107,7 +125,10 @@ const serializeArray = (value: any[], transform: (key: string) => string): any[]
  * Converts all keys for an object into [camelCase]. Additionally it will do a serialize pass on the value.
  * If the value is an object or an array of objects it will also convert those keys into [camel case].
  */
-const serializeObject = (value: any, transform: (key: string) => string): AnyObject => {
+const serializeObject = (
+  value: any,
+  transform: (key: string) => string
+): AnyObject => {
   const ret: AnyObject = {};
   forOwn(value, function(v: any, k: string) {
     ret[transform(k)] = serialize(v, transform);
@@ -123,18 +144,18 @@ const isSameType = (control: any, value: any): boolean => {
   const controlType: string = getRealType(control);
   let valueType: string = getRealType(value);
 
-  if (valueType === 'string' && !isNaN(+value) && value !== '') {
-    valueType = 'number';
+  if (valueType === "string" && !isNaN(+value) && value !== "") {
+    valueType = "number";
   }
-  if (controlType === 'string' && valueType === 'number') {
+  if (controlType === "string" && valueType === "number") {
     value = value.toString();
     valueType = typeof value;
   }
-  if (controlType === 'boolean' && isBooleanesque(value)) {
-    valueType = 'boolean';
+  if (controlType === "boolean" && isBooleanesque(value)) {
+    valueType = "boolean";
   }
-  if (valueType === 'string' && isTimestampesque(value)) {
-    valueType = 'date';
+  if (valueType === "string" && isTimestampesque(value)) {
+    valueType = "date";
   }
   return controlType === valueType;
 };
@@ -175,25 +196,25 @@ const coerceTypes = (value: any, typeTarget: any): any => {
   const type = getRealType(typeTarget);
 
   switch (type) {
-    case 'string': {
-      return value !== null ? value.toString() : '';
+    case "string": {
+      return value !== null ? value.toString() : "";
     }
-    case 'number': {
+    case "number": {
       return +value;
     }
-    case 'boolean': {
+    case "boolean": {
       if (!isBooleanesque(value)) {
         throw TypeError(`Cannot coerce ${value} to boolean`);
       }
-      if (value === 'true') {
+      if (value === "true") {
         return true;
       }
-      if (value === 'false') {
+      if (value === "false") {
         return false;
       }
       return !!Number(value);
     }
-    case 'date': {
+    case "date": {
       return new Date(value);
     }
     default: {
@@ -218,13 +239,13 @@ const coerceTypes = (value: any, typeTarget: any): any => {
  */
 const getRealType = (value: any): string => {
   if (Array.isArray(value)) {
-    return 'array';
+    return "array";
   }
   if (value instanceof Date) {
-    return 'date';
+    return "date";
   }
   if (value === null) {
-    return 'null';
+    return "null";
   }
   return typeof value;
 };

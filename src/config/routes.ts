@@ -1,4 +1,4 @@
-const index = '/';
+const index = "/";
 
 const login = `${index}login`;
 const create = `${index}create`;

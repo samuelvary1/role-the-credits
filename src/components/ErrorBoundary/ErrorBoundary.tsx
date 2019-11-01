@@ -1,5 +1,5 @@
-import React, { Component, ErrorInfo } from 'react';
-import * as Sentry from '@sentry/browser/esm';
+import React, { Component, ErrorInfo } from "react";
+import * as Sentry from "@sentry/browser/esm";
 
 type ComponentState = {
   hasError: boolean;
@@ -13,7 +13,9 @@ class ErrorBoundary extends Component<{}, ComponentState> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ hasError: true });
     Sentry.withScope(scope => {
-      Object.keys(errorInfo).forEach(key => scope.setExtra(key, errorInfo[key as keyof ErrorInfo]));
+      Object.keys(errorInfo).forEach(key =>
+        scope.setExtra(key, errorInfo[key as keyof ErrorInfo])
+      );
       Sentry.captureException(error);
     });
   }
@@ -24,7 +26,7 @@ class ErrorBoundary extends Component<{}, ComponentState> {
 
     if (hasError) {
       // render fallback UI
-      return <h1 style={{ textAlign: 'center' }}>Something went wrong</h1>;
+      return <h1 style={{ textAlign: "center" }}>Something went wrong</h1>;
     }
     return children;
   }
